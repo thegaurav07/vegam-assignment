@@ -1,4 +1,5 @@
 // src/api/userApi.ts
+
 import type { User, UsersApiResponse, PaginationParams } from '@/types';
 import {
   mockFetchUsers,
@@ -9,6 +10,8 @@ const API_BASE = '/api';
 
 /**
  * Fetch users with pagination and filters
+ * - Uses real API if available
+ * - Falls back to mock data in production (Vercel)
  */
 export const fetchUsers = async (
   params: PaginationParams
@@ -19,26 +22,34 @@ export const fetchUsers = async (
       pageSize: String(params.pageSize),
     });
 
-    if (params.query) searchParams.set('query', params.query);
+    if (params.query) {
+      searchParams.set('query', params.query);
+    }
+
+    // "all" is UI-only → never send to backend
     if (params.status && params.status !== 'all') {
       searchParams.set('status', params.status);
     }
 
-    const response = await fetch(`${API_BASE}/users?${searchParams}`);
+    const response = await fetch(
+      `${API_BASE}/users?${searchParams.toString()}`
+    );
 
     if (!response.ok) {
       throw new Error('API not available');
     }
 
     return await response.json();
-  } catch {
-    console.warn('API unavailable. Using mock users data.');
-    return mockFetchUsers(params); // ✅ NO RED LINE
+  } catch (error) {
+    console.warn('API unavailable. Falling back to mock users data.', error);
+    return mockFetchUsers(params);
   }
 };
 
 /**
  * Update user status
+ * - Uses real API if available
+ * - Falls back to mock update when API is unavailable
  */
 export const updateUserStatus = async (
   userId: string,
@@ -56,7 +67,9 @@ export const updateUserStatus = async (
     }
 
     return await response.json();
-  } catch {
+  } catch (error) {
+    console.warn('API unavailable. Using mock status update.', error);
+
     const updatedUser = mockUpdateUserStatus(userId, status);
 
     return {
@@ -66,4 +79,3 @@ export const updateUserStatus = async (
     };
   }
 };
-
