@@ -1,4 +1,4 @@
-# Admin Dashboard - Internship Assignment
+<!-- # Admin Dashboard - Internship Assignment
 
 A pre-built admin dashboard with **intentional bugs** and **incomplete features** for you to fix and complete.
 
@@ -58,6 +58,7 @@ This project demonstrates clean architecture, bug fixing, feature enhancements, 
 ## Quick Start
 
 ```bash
+
 # Install dependencies
 npm install
 
@@ -138,4 +139,85 @@ CANDIDATE: Document your changes here after completing the assignment.
 1. **Debounced Search** - ...
 2. **Loading Skeleton** - ...
 3. **Optimistic UI** - ...
--->
+--> -->
+
+
+
+# Admin Dashboard – Internship Assignment
+
+A React + TypeScript based **Admin Dashboard** built as part of the **Internship Technical Assessment**.
+
+This project demonstrates the ability to **debug an existing codebase**, **complete incomplete features**, and **build production-ready enhancements** following real-world frontend practices.
+
+---
+
+## 🔗 Live Demo
+
+https://vegam-assignment1.vercel.app
+
+---
+
+## ⚠️ Live Demo Note (Important)
+
+This project uses **MSW (Mock Service Worker)** to mock backend APIs.
+
+- MSW works fully in **local development**
+- In production deployments (Vercel / Netlify), MSW does not intercept API requests
+- As a result, API-dependent features may not function correctly in the live demo
+
+👉 **For full functionality, please run the project locally** using the instructions below.
+
+---
+
+## 🚀 Tech Stack
+
+- React 18
+- TypeScript (strict mode)
+- Vite
+- Material UI (MUI)
+- Material React Table
+- React Query (@tanstack/react-query)
+- React Router v6
+- MSW (Mock Service Worker)
+- Notistack (Snackbar notifications)
+
+---
+
+## ✅ Completed Requirements
+
+### 🐞 Bug Fixes
+- ✔ Fixed table not refreshing after user status update using React Query cache invalidation
+- ✔ Fixed Groups column rendering (`[object Object]` → group name chips)
+- ✔ Synced pagination, filters, and search state with URL parameters
+
+---
+
+### ✨ Completed Features
+- ✔ Debounced search (300ms) to prevent excessive API calls
+- ✔ Server-side pagination
+- ✔ Optimistic UI updates for user status toggle
+- ✔ Loading skeleton for table during data fetch
+- ✔ User-friendly error handling
+- ✔ Global Error Boundary with retry option
+
+---
+
+### 🧩 Actions Column Enhancements
+- ✔ Enable / Disable user status
+- ✔ Accessible action buttons with hover states
+- ✔ Keyboard-friendly interactions
+- ⚠ Confirmation dialog before deactivation (optional – not mandatory)
+
+---
+
+## 🧪 Error Handling
+- Global `ErrorBoundary` to catch runtime crashes
+- Friendly fallback UI with retry option
+- React Query error states handled gracefully
+
+---
+
+## 📂 Project Structure
+
+
+

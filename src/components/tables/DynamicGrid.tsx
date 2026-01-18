@@ -47,15 +47,15 @@ const renderCellByType = (
     case 'chiplist': {
       const groups = value as Group[];
 
-      if (!Array.isArray(groups) || groups.length === 0) {
+      if (!Array.isArray(value) || value.length === 0) {
         return <span style={{ color: '#999' }}>No groups</span>;
       }
 
       return (
         <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-          {groups.map((group) => (
+          {groups.map((group:any) => (
             <Chip
-              key={group.groupName}
+              key={group.id||group.groupName}
               label={group.groupName}
               size="small"
               variant="outlined"
