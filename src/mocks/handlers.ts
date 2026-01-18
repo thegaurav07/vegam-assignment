@@ -1,5 +1,8 @@
 import { http, HttpResponse, delay } from 'msw';
-import { getUsers, updateUserStatus } from './data';
+import {
+  mockFetchUsers,
+  mockUpdateUserStatus,
+} from './data';
 
 export const handlers = [
   // GET /api/users - Fetch users with pagination and filters
@@ -8,17 +11,25 @@ export const handlers = [
     await delay(500);
 
     const url = new URL(request.url);
-    const page = parseInt(url.searchParams.get('page') || '1');
-    const pageSize = parseInt(url.searchParams.get('pageSize') || '10');
-    const query = url.searchParams.get('query') || '';
-    const status = url.searchParams.get('status') || 'all';
 
-    const result = getUsers({ page, pageSize, query, status });
+    const page = Number(url.searchParams.get('page') ?? 1);
+    const pageSize = Number(url.searchParams.get('pageSize') ?? 10);
+    const query = url.searchParams.get('query') ?? '';
+    const status =
+      (url.searchParams.get('status') as 'all' | 'active' | 'inactive') ??
+      'all';
+
+    const result = mockFetchUsers({
+      page,
+      pageSize,
+      query,
+      status,
+    });
 
     return HttpResponse.json({
       data: {
-        totalCount: result.totalCount,
-        users: result.users,
+        users: result.data.users,
+        totalCount: result.data.totalCount,
       },
     });
   }),
@@ -29,9 +40,14 @@ export const handlers = [
     await delay(300);
 
     const { id } = params;
-    const body = await request.json() as { status: 'active' | 'inactive' };
+    const body = (await request.json()) as {
+      status: 'active' | 'inactive';
+    };
 
-    const updatedUser = updateUserStatus(id as string, body.status);
+    const updatedUser = mockUpdateUserStatus(
+      id as string,
+      body.status
+    );
 
     if (!updatedUser) {
       return HttpResponse.json(
@@ -41,9 +57,9 @@ export const handlers = [
     }
 
     return HttpResponse.json({
-      success: true,
       data: updatedUser,
       message: `User status updated to ${body.status}`,
     });
   }),
 ];
+

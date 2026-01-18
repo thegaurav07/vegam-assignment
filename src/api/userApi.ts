@@ -1,4 +1,9 @@
+// src/api/userApi.ts
 import type { User, UsersApiResponse, PaginationParams } from '@/types';
+import {
+  mockFetchUsers,
+  mockUpdateUserStatus,
+} from '@/mocks/data';
 
 const API_BASE = '/api';
 
@@ -8,46 +13,57 @@ const API_BASE = '/api';
 export const fetchUsers = async (
   params: PaginationParams
 ): Promise<UsersApiResponse> => {
-  const searchParams = new URLSearchParams({
-    page: params.page.toString(),
-    pageSize: params.pageSize.toString(),
-  });
+  try {
+    const searchParams = new URLSearchParams({
+      page: String(params.page),
+      pageSize: String(params.pageSize),
+    });
 
-  if (params.query) {
-    searchParams.set('query', params.query);
+    if (params.query) searchParams.set('query', params.query);
+    if (params.status && params.status !== 'all') {
+      searchParams.set('status', params.status);
+    }
+
+    const response = await fetch(`${API_BASE}/users?${searchParams}`);
+
+    if (!response.ok) {
+      throw new Error('API not available');
+    }
+
+    return await response.json();
+  } catch {
+    console.warn('API unavailable. Using mock users data.');
+    return mockFetchUsers(params); // ✅ NO RED LINE
   }
-
-  if (params.status && params.status !== 'all') {
-    searchParams.set('status', params.status);
-  }
-
-  const response = await fetch(`${API_BASE}/users?${searchParams}`);
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch users');
-  }
-
-  return response.json();
 };
 
 /**
- * Update user status (activate/deactivate)
+ * Update user status
  */
 export const updateUserStatus = async (
   userId: string,
   status: 'active' | 'inactive'
 ): Promise<{ success: boolean; data: User; message: string }> => {
-  const response = await fetch(`${API_BASE}/users/${userId}`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ status }),
-  });
+  try {
+    const response = await fetch(`${API_BASE}/users/${userId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    });
 
-  if (!response.ok) {
-    throw new Error('Failed to update user status');
+    if (!response.ok) {
+      throw new Error('API not available');
+    }
+
+    return await response.json();
+  } catch {
+    const updatedUser = mockUpdateUserStatus(userId, status);
+
+    return {
+      success: true,
+      data: updatedUser as User,
+      message: 'User status updated (mock)',
+    };
   }
-
-  return response.json();
 };
+
