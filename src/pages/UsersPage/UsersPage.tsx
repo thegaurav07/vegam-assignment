@@ -31,7 +31,7 @@ export const UsersPage: React.FC = () => {
   /* -------------------- INITIAL STATE FROM URL -------------------- */
   const initialPage = Number(searchParams.get('page') || 1) - 1;
   const initialStatus =
-    (searchParams.get('status') as 'all' | 'active' | 'inactive') || 'all';
+    (searchParams.get('status') as 'active' | 'inactive') || 'all';
   const initialQuery = searchParams.get('query') || '';
 
   const [searchQuery, setSearchQuery] = useState(initialQuery);
@@ -47,19 +47,29 @@ export const UsersPage: React.FC = () => {
 
   /* -------------------- SYNC STATE → URL -------------------- */
   useEffect(() => {
-    setSearchParams({
+    const params: Record<string, string> = {
       page: String(pagination.pageIndex + 1),
-      status: statusFilter,
-      query: debouncedSearch,
-    });
+    };
+
+    // Only include status if NOT "all"
+    if (statusFilter !== 'all') {
+      params.status = statusFilter;
+    }
+
+    // Only include query if not empty
+    if (debouncedSearch) {
+      params.query = debouncedSearch;
+    }
+
+    setSearchParams(params);
   }, [pagination.pageIndex, statusFilter, debouncedSearch, setSearchParams]);
 
   /* -------------------- FETCH USERS -------------------- */
   const { data, isLoading, error, refetch } = useUsers({
     page: pagination.pageIndex + 1,
     pageSize: pagination.pageSize,
-    query: debouncedSearch,
-    status: statusFilter,
+    query: debouncedSearch || undefined,
+    status: statusFilter === 'all' ? undefined : statusFilter,
   });
 
   /* -------------------- MUTATION -------------------- */
@@ -73,7 +83,7 @@ export const UsersPage: React.FC = () => {
     updateStatus(
       { userId, status: newStatus },
       {
-        onSuccess: (response) => {
+        onSuccess: (response: any) => {
           enqueueSnackbar(response.message, { variant: 'success' });
         },
         onError: () => {
